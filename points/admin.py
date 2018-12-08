@@ -7,7 +7,7 @@ class AuthorAdmin(admin.ModelAdmin):
 
 admin.site.register(Location)
 admin.site.register(Team)
-admin.site.register(User)
+admin.site.register(Profile)
 admin.site.register(User_team)
 admin.site.register(Local)
 admin.site.register(Space)

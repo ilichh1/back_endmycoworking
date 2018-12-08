@@ -18,13 +18,13 @@ class Team(models.Model):
     def __str__(self):
         return self.name
 
-class User(models.Model):
+class Profile(models.Model):
     correo=models.EmailField(primary_key=True)
     name=models.OneToOneField(User, related_name='userprofile', on_delete=models.CASCADE)
     photo=models.URLField(blank=True,null=True)
     description=models.TextField(blank=True,null=True)
     def __str__(self):
-        return self.name
+        return self.correo
         
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

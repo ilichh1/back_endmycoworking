@@ -1,4 +1,5 @@
 from .models import *
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -14,14 +15,27 @@ class TeamSerializer(serializers.ModelSerializer):
         fields= '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
+	password = serializers.CharField(write_only=True)
+	class Meta:
+		model = User
+		fields = ['username', 'email', 'id', 'password']
+	def create(self, validated_data):
+		password = validated_data.pop('password')
+		user = User.objects.create(**validated_data)
+		user.set_password(password)
+		user.save()
 
+		return user
+
+class ProfileSerializer(serializers.ModelSerializer):
+    name=UserSerializer(many=False,read_only=True)
     class Meta:
-        model=User
+        model=Profile
         fields='__all__'
 
 class User_teamSerializer(serializers.ModelSerializer):
-    user=UserSerializer(many=False, read_only=True)
-    user_id=serializers.PrimaryKeyRelatedField(source='User',queryset=User.objects.all())
+    profile=ProfileSerializer(many=False, read_only=True)
+    profile_id=serializers.PrimaryKeyRelatedField(source='Profile',queryset=Profile.objects.all())
     team=TeamSerializer(many=False,read_only=True)
     team_id=serializers.PrimaryKeyRelatedField(source='Team',queryset=Team.objects.all())
     
@@ -54,8 +68,8 @@ class CoworkingSerializer(serializers.ModelSerializer):
         fields='__all__'
 
 class StatusSerializer(serializers.ModelSerializer):
-    user=UserSerializer(many=False, read_only=True)
-    user_id=serializers.PrimaryKeyRelatedField(source='User',queryset=User.objects.all())
+    profile=ProfileSerializer(many=False, read_only=True)
+    profile_id=serializers.PrimaryKeyRelatedField(source='Profile',queryset=Profile.objects.all())
     coworking=CoworkingSerializer(many=False, read_only=True)
     coworking_id=serializers.PrimaryKeyRelatedField(source='Coworking',queryset=Coworking.objects.all())
     class Meta:
